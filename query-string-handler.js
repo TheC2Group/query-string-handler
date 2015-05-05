@@ -78,11 +78,6 @@ var queryStringHandler = (function () {
 
     return {
 
-        clone: function (obj) {
-            if (typeof obj !== 'object') return extend({}, _query);
-            return extend({}, _query, obj);
-        },
-
         update: function () {
             _query = update();
         },
@@ -94,16 +89,18 @@ var queryStringHandler = (function () {
 
         toString: toString,
 
-        push: function (obj, title) {
-            var state = extend(_query, obj);
+        push: function (changes, title) {
+            if (typeof changes !== 'object') return;
+            var state = extend(_query, changes);
             if (hasHistoryApi) {
                 history.pushState(state, title || null, toString());
             }
             emit('push');
         },
 
-        replace: function (obj, title) {
-            var state = extend(_query, obj);
+        replace: function (changes, title) {
+            if (typeof changes !== 'object') return;
+            var state = extend(_query, changes);
             if (hasHistoryApi) {
                 history.replaceState(state, title || null, toString());
             }
@@ -113,6 +110,11 @@ var queryStringHandler = (function () {
         addListener: function (callback) {
             if (typeof callback !== 'function') return;
             _listeners.push(callback);
+        },
+
+        clone: function (obj) {
+            if (typeof obj !== 'object') return extend({}, _query);
+            return extend({}, _query, obj);
         }
     };
 }());
