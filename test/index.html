@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>query-string-handler</title>
+        <meta name="viewport" content="initial-scale=1, width=device-width">
+        <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-1.18.0.css">
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+
+        <script src="https://code.jquery.com/qunit/qunit-1.18.0.js"></script>
+        <script src="../query-string-handler.js"></script>
+        <script>
+            var qs = queryStringHandler;
+            var foo = '$&8="thing`';
+            var pageInit = '?beep=boop&foo=%24%268%3D%22thing%60';
+            if (document.location.search !== pageInit) {
+                document.location = pageInit;
+            }
+
+            QUnit.test("Get value", function (assert) {
+                assert.ok(qs.getValue('beep') === 'boop', "Passed!");
+            });
+
+            QUnit.test("Get decoded value", function (assert) {
+                assert.ok(qs.getValue('foo') === foo, "Passed!");
+            });
+
+            QUnit.test("Query toString", function (assert) {
+                assert.ok(qs.toString() === '?beep=boop&foo=%24%268%3D%22thing%60', "Passed!");
+            });
+
+            QUnit.test("Query toString encoded", function (assert) {
+                assert.ok(qs.toString(true) === '?beep=boop&amp;foo=%24%268%3D%22thing%60', "Passed!");
+            });
+
+            QUnit.test("Query toString parameters", function (assert) {
+                assert.ok(qs.toString(false, { beep: 'yep' }) === '?beep=yep&foo=%24%268%3D%22thing%60', "Passed!");
+            });
+
+            QUnit.test("Push state", function (assert) {
+                qs.push({ beep: 'push=*' }, 'query-string-handler push');
+                assert.ok(qs.getValue('beep') === 'push=*', "Passed!");
+            });
+
+            QUnit.test("Replace state", function (assert) {
+                qs.replace({ beep: 'replace=*' });
+                assert.ok(qs.getValue('beep') === 'replace=*', "Passed!");
+            });
+
+            QUnit.test("Pop state listener", function (assert) {
+                var done = assert.async();
+
+                qs.push({ beep: 'test' }, 'query-string-handler test');
+                qs.push({ beep: 'test2' }, 'query-string-handler test2');
+
+                qs.addListener(function (type) {
+                    if (type !== 'pop') return;
+                    assert.ok(qs.getValue('beep') === 'test', "Passed!");
+                    done();
+                });
+
+                history.back();
+            });
+
+            QUnit.test("Clone extend", function (assert) {
+                qs.replace({ beep: 'boop clone', foo: 'foo clone' });
+                assert.deepEqual(qs.clone({ beep: 'extend' }), { beep: 'extend', foo: 'foo clone' }, "Passed!");
+            });
+        </script>
+    </body>
+</html>
