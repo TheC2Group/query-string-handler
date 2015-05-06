@@ -40,6 +40,10 @@
                 assert.ok(qs.toString(false, { beep: 'yep' }) === '?beep=yep&foo=%24%268%3D%22thing%60', "Passed!");
             });
 
+            QUnit.test("Query toString empty", function (assert) {
+                assert.ok(qs.toString(false, { beep: '', foo: '' }) === '?', "Passed!");
+            });
+
             QUnit.test("Push state", function (assert) {
                 qs.push({ beep: 'push=*' }, 'query-string-handler push');
                 assert.ok(qs.getValue('beep') === 'push=*', "Passed!");

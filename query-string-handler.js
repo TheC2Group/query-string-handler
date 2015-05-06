@@ -56,9 +56,13 @@ var queryStringHandler = (function () {
 
         if (keys.length === 0) return '';
 
-        return '?' + keys.map(function (key) {
-            return key + '=' + encodeURIComponent(query[key]);
-        }).join(encoded ? '&amp;' : '&');
+        var result = keys.map(function (key) {
+            return query[key] ? key + '=' + encodeURIComponent(query[key]) : '';
+        })
+        .filter(function (i) { return i; })
+        .join(encoded ? '&amp;' : '&');
+
+        return '?' + result;
     };
 
     var emit = function (type) {
