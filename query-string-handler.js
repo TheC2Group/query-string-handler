@@ -1,6 +1,6 @@
 /*!
  * query-string-handler
- * version: 1.0.0
+ * version: 1.1.0
  * https://stash.c2mpg.com:8443/projects/C2/repos/query-string-handler
  */
 
@@ -26,7 +26,17 @@ var queryStringHandler = (function () {
         }
 
         Object.keys(obj).forEach(function (key) {
-            target[key] = obj[key];
+            var val = obj[key];
+
+            if (typeof val === 'undefined' || val === null) {
+                val = '';
+            } else if (typeof val === 'object') {
+                val = JSON.stringify(val);
+            } else if (typeof val !== 'string') {
+                val = String(val);
+            }
+
+            target[key] = val;
         });
 
         if (arguments.length > 2) {
@@ -54,7 +64,7 @@ var queryStringHandler = (function () {
 
         var keys = Object.keys(query);
 
-        if (keys.length === 0) return '';
+        if (keys.length === 0) return '?';
 
         var result = keys.map(function (key) {
             return query[key] ? key + '=' + encodeURIComponent(query[key]) : '';

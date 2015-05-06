@@ -21,37 +21,49 @@
             }
 
             QUnit.test("Get value", function (assert) {
-                assert.ok(qs.getValue('beep') === 'boop', "Passed!");
+                assert.strictEqual(qs.getValue('beep'), 'boop');
             });
 
             QUnit.test("Get decoded value", function (assert) {
-                assert.ok(qs.getValue('foo') === foo, "Passed!");
+                assert.strictEqual(qs.getValue('foo'), foo);
             });
 
             QUnit.test("Query toString", function (assert) {
-                assert.ok(qs.toString() === '?beep=boop&foo=%24%268%3D%22thing%60', "Passed!");
+                assert.strictEqual(qs.toString(), '?beep=boop&foo=%24%268%3D%22thing%60');
             });
 
             QUnit.test("Query toString encoded", function (assert) {
-                assert.ok(qs.toString(true) === '?beep=boop&amp;foo=%24%268%3D%22thing%60', "Passed!");
+                assert.strictEqual(qs.toString(true), '?beep=boop&amp;foo=%24%268%3D%22thing%60');
             });
 
             QUnit.test("Query toString parameters", function (assert) {
-                assert.ok(qs.toString(false, { beep: 'yep' }) === '?beep=yep&foo=%24%268%3D%22thing%60', "Passed!");
+                assert.strictEqual(qs.toString(false, { beep: 'yep' }), '?beep=yep&foo=%24%268%3D%22thing%60');
+            });
+
+            QUnit.test("Convert everything to a string", function (assert) {
+                var undef;
+                var obj = {
+                    more: 'parameters',
+                    and: null
+                };
+                assert.strictEqual(
+                    qs.toString(true, { beep: undef, foo: null, obj: obj, num: 5.9 }),
+                    '?obj=%7B%22more%22%3A%22parameters%22%2C%22and%22%3Anull%7D&amp;num=5.9'
+                );
             });
 
             QUnit.test("Query toString empty", function (assert) {
-                assert.ok(qs.toString(false, { beep: '', foo: '' }) === '?', "Passed!");
+                assert.strictEqual(qs.toString(false, { beep: '', foo: '' }), '?');
             });
 
             QUnit.test("Push state", function (assert) {
                 qs.push({ beep: 'push=*' }, 'query-string-handler push');
-                assert.ok(qs.getValue('beep') === 'push=*', "Passed!");
+                assert.strictEqual(qs.getValue('beep'), 'push=*');
             });
 
             QUnit.test("Replace state", function (assert) {
                 qs.replace({ beep: 'replace=*' });
-                assert.ok(qs.getValue('beep') === 'replace=*', "Passed!");
+                assert.strictEqual(qs.getValue('beep'), 'replace=*');
             });
 
             QUnit.test("Pop state listener", function (assert) {
@@ -62,7 +74,7 @@
 
                 qs.addListener(function (type) {
                     if (type !== 'pop') return;
-                    assert.ok(qs.getValue('beep') === 'test', "Passed!");
+                    assert.strictEqual(qs.getValue('beep'), 'test');
                     done();
                 });
 
@@ -71,7 +83,7 @@
 
             QUnit.test("Clone extend", function (assert) {
                 qs.replace({ beep: 'boop clone', foo: 'foo clone' });
-                assert.deepEqual(qs.clone({ beep: 'extend' }), { beep: 'extend', foo: 'foo clone' }, "Passed!");
+                assert.deepEqual(qs.clone({ beep: 'extend' }), { beep: 'extend', foo: 'foo clone' });
             });
         </script>
     </body>

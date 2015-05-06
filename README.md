@@ -84,3 +84,12 @@ Tests
 -----
 
 Tests are written in qUnit. Open `/test/index.html` in a browser.
+
+
+ES5 methods to polyfill
+-----------------------
+
+* Object.keys
+* Array.forEach
+* Array.map
+* Array.filter
