@@ -17,11 +17,11 @@ var queryStringHandler = (function () {
     var extend = function (target, obj) {
         var args;
 
-        if (typeof target !== 'object') {
-            return {};
+        if (target === null || typeof target !== 'object') {
+            target = {};
         }
 
-        if (typeof obj !== 'object') {
+        if (obj === null || typeof obj !== 'object') {
             return target;
         }
 
