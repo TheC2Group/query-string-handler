@@ -81,11 +81,30 @@ var queryStringHandler = (function () {
         });
     };
 
-    if (hasHistoryApi) {
-        window.addEventListener('popstate', function (e) {
-            _query = extend({}, e.state);
+    var onpopstate = (function () {
+
+        // because Safari
+        var loaded = false;
+        if (document.readyState === 'complete') {
+            loaded = true;
+        } else {
+            window.addEventListener('load', function () {
+                setTimeout(function () {
+                    loaded = true;
+                }, 0);
+            });
+        }
+
+        return function () {
+            if (!loaded) return;
+            //_query = extend({}, e.state); because Safari
+            _query = update();
             emit('pop');
-        });
+        };
+    }());
+
+    if (hasHistoryApi) {
+        window.addEventListener('popstate', onpopstate);
     }
 
     _query = update();
