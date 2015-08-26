@@ -1,6 +1,6 @@
 /*!
  * query-string-handler
- * version: 1.1.0
+ * version: 1.1.1
  * https://stash.c2mpg.com:8443/projects/C2/repos/query-string-handler
  */
 
