@@ -153,5 +153,5 @@ var queryStringHandler = (function () {
 
 // export commonjs
 if (typeof module !== 'undefined' && ('exports' in module)) {
-    module.exports = eventHandler;
+    module.exports = queryStringHandler;
 }
