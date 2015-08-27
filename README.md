@@ -80,7 +80,7 @@ queryStringHandler.clone({ beep: 'boop' });
 ```
 
 
-install
+Install
 -------
 
 ```
