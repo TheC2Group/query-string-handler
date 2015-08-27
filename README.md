@@ -80,6 +80,14 @@ queryStringHandler.clone({ beep: 'boop' });
 ```
 
 
+install
+-------
+
+```
+npm install query-string-handler
+```
+
+
 Tests
 -----
 
@@ -93,3 +101,9 @@ ES5 methods to polyfill
 * Array.forEach
 * Array.map
 * Array.filter
+
+
+License
+-------
+
+MIT © [The C2 Group](https://c2experience.com)

@@ -1,10 +1,9 @@
 /*!
- * query-string-handler
- * version: 1.1.1
- * https://stash.c2mpg.com:8443/projects/C2/repos/query-string-handler
+ * Query String Handler
+ * https://github.com/TheC2Group/query-string-handler
+ * @version 1.2.0
+ * @license MIT (c) The C2 Group (c2experience.com)
  */
-
-/* exported queryStringHandler */
 
 var queryStringHandler = (function () {
     'use strict';
@@ -151,3 +150,8 @@ var queryStringHandler = (function () {
         }
     };
 }());
+
+// export commonjs
+if (typeof module !== 'undefined' && ('exports' in module)) {
+    module.exports = eventHandler;
+}
