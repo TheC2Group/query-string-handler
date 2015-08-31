@@ -1,7 +1,7 @@
 /*!
  * Query String Handler
  * https://github.com/TheC2Group/query-string-handler
- * @version 1.2.0
+ * @version 1.2.1
  * @license MIT (c) The C2 Group (c2experience.com)
  */
 

@@ -72,11 +72,12 @@ history.back(); // 'pop'
 
 ### .clone([obj])
 @param *obj* {Object}  
+@return {Object}
 
 ```js
 // clone the private query string object
 // optionally pass in an object to extend the query string
-queryStringHandler.clone({ beep: 'boop' });
+var clone = queryStringHandler.clone({ beep: 'boop' });
 ```
 
 
