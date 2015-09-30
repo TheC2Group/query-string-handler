@@ -1,6 +1,6 @@
 {
   "name": "query-string-handler",
-  "version": "1.2.1",
+  "version": "2.0.0",
   "description": "This turns the query string into a private object. Use the API to read and manipulate the query string.",
   "main": "query-string-handler.js",
   "scripts": {

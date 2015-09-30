@@ -31,6 +31,7 @@ var val = queryStringHandler.getValue('name');
 // get the query string in string format
 // optionally encode the ampersands with the first parameter
 // optionally temporary extend the query string with the second parameter
+// if all parameters are blank, it will return location.pathname
 var url = queryStringHandler.toString(true, { beep: 'bop' });
 console.log(url); // '?beep=bop'
 ```
@@ -78,6 +79,16 @@ history.back(); // 'pop'
 // clone the private query string object
 // optionally pass in an object to extend the query string
 var clone = queryStringHandler.clone({ beep: 'boop' });
+```
+
+### .clear(method = 'push'[, title])
+@param *method* {String} replace|push  
+@param *title* {String}  
+
+```js
+// clone the private query string object
+// optionally pass in an object to extend the query string
+queryStringHandler.clear();
 ```
 
 

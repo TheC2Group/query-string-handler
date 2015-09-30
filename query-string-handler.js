@@ -1,7 +1,7 @@
 /*!
  * Query String Handler
  * https://github.com/TheC2Group/query-string-handler
- * @version 1.2.1
+ * @version 2.0.0
  * @license MIT (c) The C2 Group (c2experience.com)
  */
 
@@ -58,12 +58,21 @@ var queryStringHandler = (function () {
         return qs;
     };
 
+    var getPathname = function () {
+        if (window.location.pathname) {
+            return window.location.pathname;
+        }
+        var href = window.location.href;
+        var qIndex = href.indexOf('?');
+        return (qIndex === -1) ? href : href.substring(0, qIndex);
+    };
+
     var toString = function (encoded, params) {
         var query = (params) ? extend({}, _query, params) : _query;
 
         var keys = Object.keys(query);
 
-        if (keys.length === 0) return '?';
+        if (keys.length === 0) return getPathname();
 
         var result = keys.map(function (key) {
             return query[key] ? key + '=' + encodeURIComponent(query[key]) : '';
@@ -71,7 +80,7 @@ var queryStringHandler = (function () {
         .filter(function (i) { return i; })
         .join(encoded ? '&amp;' : '&');
 
-        return '?' + result;
+        return (result) ? '?' + result : getPathname();
     };
 
     var emit = function (type) {
@@ -147,6 +156,13 @@ var queryStringHandler = (function () {
         clone: function (obj) {
             if (typeof obj !== 'object') return extend({}, _query);
             return extend({}, _query, obj);
+        },
+
+        clear: function (method, title) {
+            method = method || 'push';
+            _query = {};
+            if (!hasHistoryApi || ['replace', 'push'].indexOf(method) === -1) return;
+            this[method]({}, title);
         }
     };
 }());

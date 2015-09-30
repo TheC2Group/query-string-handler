@@ -11,14 +11,15 @@
         <div id="qunit-fixture"></div>
 
         <script src="https://code.jquery.com/qunit/qunit-1.18.0.js"></script>
-        <script src="../dist/query-string-handler.min.js"></script>
+        <script src="../query-string-handler.js"></script>
         <script>
             var qs = queryStringHandler;
             var foo = '$&8="thing`';
             var pageInit = '?beep=boop&foo=%24%268%3D%22thing%60';
             if (document.location.search !== pageInit) {
-                document.location = pageInit;
+                history.replaceState({}, null, pageInit);
             }
+            qs.update();
 
             QUnit.test("Get value", function (assert) {
                 assert.strictEqual(qs.getValue('beep'), 'boop');
@@ -53,12 +54,12 @@
             });
 
             QUnit.test("Query toString empty", function (assert) {
-                assert.strictEqual(qs.toString(false, { beep: '', foo: '' }), '?');
+                assert.strictEqual(qs.toString(false, { beep: '', foo: '' }), window.location.pathname);
             });
 
             QUnit.test("Push state", function (assert) {
-                qs.push({ beep: 'push=*' }, 'query-string-handler push');
-                assert.strictEqual(qs.getValue('beep'), 'push=*');
+                qs.push({ beep: 'push' }, 'query-string-handler push');
+                assert.strictEqual(qs.getValue('beep'), 'push');
             });
 
             QUnit.test("Replace state", function (assert) {
@@ -84,6 +85,12 @@
             QUnit.test("Clone extend", function (assert) {
                 qs.replace({ beep: 'boop clone', foo: 'foo clone' });
                 assert.deepEqual(qs.clone({ beep: 'extend' }), { beep: 'extend', foo: 'foo clone' });
+            });
+
+            QUnit.test("Clear state", function (assert) {
+                qs.clear('push', 'query-string-handler test clear');
+                assert.deepEqual(qs.clone(), {});
+                assert.strictEqual(window.location.search, '');
             });
         </script>
     </body>
