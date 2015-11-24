@@ -1,10 +1,15 @@
 {
   "name": "query-string-handler",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "This turns the query string into a private object. Use the API to read and manipulate the query string.",
-  "main": "query-string-handler.js",
+  "jsnext:main": "query-string-handler.js",
+  "main": "cjs/query-string-handler.js",
+  "export": "queryStringHandler",
   "scripts": {
-    "dist": "uglifyjs query-string-handler.js -o dist/query-string-handler.min.js --comments"
+    "iife": "rollup -c rollup-iife.config.js",
+    "cjs": "rollup -c rollup-cjs.config.js",
+    "umd": "rollup -c rollup-umd.config.js",
+    "build": "npm run iife && npm run cjs && npm run umd"
   },
   "repository": {
     "type": "git",
@@ -15,5 +20,15 @@
     "query string"
   ],
   "author": "The C2 Group",
-  "license": "MIT"
+  "license": "MIT",
+  "copyright": "(c) The C2 Group (c2experience.com)",
+  "bugs": {
+    "url": "https://github.com/TheC2Group/query-string-handler/issues"
+  },
+  "homepage": "https://github.com/TheC2Group/query-string-handler",
+  "devDependencies": {
+    "babel-preset-es2015-rollup": "^1.0.0",
+    "rollup": "^0.21.0",
+    "rollup-plugin-babel": "^2.1.0"
+  }
 }
