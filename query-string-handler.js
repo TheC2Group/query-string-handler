@@ -1,95 +1,119 @@
 'use strict';
 
-var hasHistoryApi = (typeof history.pushState !== 'undefined');
+import eventHandler from 'c2-event-handler';
 
-var _query;
-var _listeners = [];
+const qsh = eventHandler({});
 
-var extend = function (target, obj) {
-    var args;
+const hasHistoryApi = (typeof history.pushState !== 'undefined');
 
+let _defaults = {};
+let _types;
+let _query;
+
+const extend = function (target, obj, ...more) {
     if (target === null || typeof target !== 'object') {
         target = {};
     }
-
     if (obj === null || typeof obj !== 'object') {
         return target;
     }
 
-    Object.keys(obj).forEach(function (key) {
-        var val = obj[key];
-
-        if (typeof val === 'undefined' || val === null) {
-            val = '';
-        } else if (typeof val === 'object') {
-            val = JSON.stringify(val);
-        } else if (typeof val !== 'string') {
-            val = String(val);
-        }
-
-        target[key] = val;
+    Object.keys(obj).forEach(key => {
+        target[key] = (typeof obj[key] === 'object' && obj[key] !== null) ? extend({}, obj[key]) : obj[key];
     });
 
-    if (arguments.length > 2) {
-        args = Array.prototype.slice.call(arguments, 2);
-        args.unshift(target);
-        return extend.apply(this, args);
+    if (more.length) {
+        more.unshift(target);
+        return extend.apply(this, more);
     }
 
     return target;
 };
 
-var update = function () {
-    var qs = {};
-    location.search.substring(1).split('&').forEach(function (section) {
-        var pair = section.split('=');
+const convertTypes = function (qs) {
+    if (!_types) return;
+    Object.keys(_types).forEach(key => {
+        if (typeof qs[key] !== 'string') return;
+        switch (_types[key]) {
+            case 'object':
+                qs[key] = JSON.parse(qs[key]);
+                break;
+            case 'boolean':
+                qs[key] = Boolean(qs[key]);
+                break;
+            case 'number':
+                qs[key] = Number(qs[key]);
+                break;
+            case 'float':
+                qs[key] = parseFloat(qs[key]);
+                break;
+            case 'int':
+                qs[key] = parseInt(qs[key]);
+                break;
+        }
+    });
+};
+
+const readQueryString = function () {
+    const qs = extend({}, _defaults);
+    location.search.substring(1).split('&').forEach(section => {
+        const pair = section.split('=');
         if (pair.length > 1) {
             qs[pair[0]] = decodeURIComponent(pair[1]);
         }
     });
+    convertTypes(qs);
     return qs;
 };
 
-var getPathname = function () {
+const getPathname = function () {
     if (window.location.pathname) {
         return window.location.pathname;
     }
-    var href = window.location.href;
-    var qIndex = href.indexOf('?');
+    const href = window.location.href;
+    const qIndex = href.indexOf('?');
     return (qIndex === -1) ? href : href.substring(0, qIndex);
 };
 
-var toString = function (encoded, params) {
-    var query = (params) ? extend({}, _query, params) : _query;
-
-    var keys = Object.keys(query);
+const toString = function (encoded, ...params) {
+    const query = (params.length) ? extend({}, _query, ...params) : _query;
+    const keys = Object.keys(query);
 
     if (keys.length === 0) return getPathname();
 
-    var result = keys.map(function (key) {
-        return query[key] ? key + '=' + encodeURIComponent(query[key]) : '';
+    const result = keys.map(key => {
+        const val = query[key];
+        let str = '';
+        if (val !== _defaults[key]) {
+            switch (typeof val) {
+                case 'object':
+                    str = (val === null) ? '' : JSON.stringify(val);
+                    break;
+                case 'number':
+                case 'boolean':
+                    str = String(val);
+                    break;
+                case 'string':
+                    str = val;
+                    break;
+            }
+        }
+        return str && `${key}=${encodeURIComponent(str)}`;
     })
-    .filter(function (i) { return i; })
+    .filter(i => i)
     .join(encoded ? '&amp;' : '&');
 
     return (result) ? '?' + result : getPathname();
 };
 
-var emit = function (type) {
-    _listeners.forEach(function (cb) {
-        cb(type);
-    });
-};
-
-var onpopstate = (function () {
-
+const onpopstate = (function () {
     // because Safari
-    var loaded = false;
+    let loaded = false;
     if (document.readyState === 'complete') {
         loaded = true;
     } else {
-        window.addEventListener('load', function () {
-            setTimeout(function () {
+        window.addEventListener('load', () => {
+            setTimeout(() => {
                 loaded = true;
             }, 0);
         });
@@ -98,8 +122,8 @@ var onpopstate = (function () {
     return function () {
         if (!loaded) return;
         //_query = extend({}, e.state); because Safari
-        _query = update();
-        emit('pop');
+        _query = readQueryString();
+        qsh.emit('pop');
     };
 }());
 
@@ -107,53 +131,54 @@ if (hasHistoryApi) {
     window.addEventListener('popstate', onpopstate);
 }
 
-_query = update();
+_query = readQueryString();
 
-export default {
-
-    update: function () {
-        _query = update();
-    },
-
-    getValue: function (name) {
-        if (typeof _query[name] !== 'string') return '';
-        return _query[name];
-    },
-
-    toString: toString,
-
-    push: function (changes, title) {
-        if (typeof changes !== 'object') return;
-        var state = extend(_query, changes);
-        if (hasHistoryApi) {
-            history.pushState(state, title || null, toString());
-        }
-        emit('push');
-    },
-
-    replace: function (changes, title) {
-        if (typeof changes !== 'object') return;
-        var state = extend(_query, changes);
-        if (hasHistoryApi) {
-            history.replaceState(state, title || null, toString());
-        }
-        emit('replace');
-    },
-
-    addListener: function (callback) {
-        if (typeof callback !== 'function') return;
-        _listeners.push(callback);
-    },
-
-    clone: function (obj) {
-        if (typeof obj !== 'object') return extend({}, _query);
-        return extend({}, _query, obj);
-    },
-
-    clear: function (method, title) {
-        method = method || 'push';
-        _query = {};
-        if (!hasHistoryApi || ['replace', 'push'].indexOf(method) === -1) return;
-        this[method]({}, title);
-    }
+qsh.update = function () {
+    _query = readQueryString();
 };
+
+qsh.setDefaults = function (defaults) {
+    _defaults = defaults;
+    _query = extend({}, defaults, _query);
+};
+
+qsh.setTypes = function (types) {
+    _types = types;
+    convertTypes(_query);
+};
+
+qsh.getValue = function (name) {
+    return (typeof _query[name] === 'object' && _query[name] !== null) ? extend({}, _query[name]) : _query[name];
+};
+
+qsh.toString = toString;
+
+qsh.push = function (changes, title) {
+    if (typeof changes !== 'object') return;
+    const state = extend(_query, changes);
+    if (hasHistoryApi) {
+        history.pushState(state, title || null, toString());
+    }
+    qsh.emit('push');
+};
+
+qsh.replace = function (changes, title) {
+    if (typeof changes !== 'object') return;
+    const state = extend(_query, changes);
+    if (hasHistoryApi) {
+        history.replaceState(state, title || null, toString());
+    }
+    qsh.emit('replace');
+};
+
+qsh.clone = function (...more) {
+    return extend({}, _query, ...more);
+};
+
+qsh.clear = function (method = 'push', title = undefined) {
+    _query = {};
+    if (!hasHistoryApi || ['replace', 'push'].indexOf(method) === -1) return;
+    this[method]({}, title);
+};
+
+export default qsh;

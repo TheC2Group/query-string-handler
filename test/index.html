@@ -11,11 +11,12 @@
         <div id="qunit-fixture"></div>
 
         <script src="https://code.jquery.com/qunit/qunit-1.18.0.js"></script>
+        <script src="event-handler.js"></script>
         <script src="../iife/query-string-handler.js"></script>
         <script>
             var qs = queryStringHandler;
             var foo = '$&8="thing`';
-            var pageInit = '?beep=boop&foo=%24%268%3D%22thing%60';
+            var pageInit = '?beep=boop&foo=%24%268%3D%22thing%60&num=55.5';
             if (document.location.search !== pageInit) {
                 history.replaceState({}, null, pageInit);
             }
@@ -27,6 +28,12 @@
 
             QUnit.test("Get decoded value", function (assert) {
                 assert.strictEqual(qs.getValue('foo'), foo);
+            });
+
+            QUnit.test("Convert types", function (assert) {
+                qs.setTypes({ num: 'float' });
+                assert.strictEqual(qs.getValue('num'), 55.5);
+                qs.replace({ num: undefined });
             });
 
             QUnit.test("Query toString", function (assert) {
@@ -49,12 +56,18 @@
                 };
                 assert.strictEqual(
                     qs.toString(true, { beep: undef, foo: null, obj: obj, num: 5.9 }),
-                    '?obj=%7B%22more%22%3A%22parameters%22%2C%22and%22%3Anull%7D&amp;num=5.9'
+                    '?num=5.9&amp;obj=%7B%22more%22%3A%22parameters%22%2C%22and%22%3Anull%7D'
                 );
             });
 
             QUnit.test("Query toString empty", function (assert) {
                 assert.strictEqual(qs.toString(false, { beep: '', foo: '' }), window.location.pathname);
+            });
+
+            QUnit.test("Leave out defaults", function (assert) {
+                qs.setDefaults({ foo: foo });
+                assert.strictEqual(qs.toString(), '?beep=boop');
+                qs.setDefaults({});
             });
 
             QUnit.test("Push state", function (assert) {
@@ -73,8 +86,7 @@
                 qs.push({ beep: 'test' }, 'query-string-handler test');
                 qs.push({ beep: 'test2' }, 'query-string-handler test2');
 
-                qs.addListener(function (type) {
-                    if (type !== 'pop') return;
+                qs.on('pop', () => {
                     assert.strictEqual(qs.getValue('beep'), 'test');
                     done();
                 });
