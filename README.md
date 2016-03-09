@@ -13,6 +13,22 @@ API
 queryStringHandler.update();
 ```
 
+### .setDefaults(obj)
+@param *obj* {Object}  
+
+```js
+// When values equal the default value, they are ignored in the "toString"
+queryStringHandler.setDefaults({ name: 'John Smith' });
+```
+
+### .setTypes(obj)
+@param *obj* {Object}  
+
+```js
+// Setting the type converts the query string value to that type
+queryStringHandler.setTypes({ num: 'float' });
+```
+
 ### .getValue(name)
 @param *name* {String}  
 @return {String}  
