@@ -60,7 +60,7 @@ var convertTypes = function convertTypes(qs) {
                 qs[key] = parseFloat(qs[key]);
                 break;
             case 'int':
-                qs[key] = parseInt(qs[key]);
+                qs[key] = parseInt(qs[key], 10);
                 break;
         }
     });

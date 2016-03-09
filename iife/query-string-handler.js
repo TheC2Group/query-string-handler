@@ -1,7 +1,7 @@
 /*!
  * query-string-handler
  * https://github.com/TheC2Group/query-string-handler
- * @version 3.0.0
+ * @version 3.0.1
  * @license MIT (c) The C2 Group (c2experience.com)
  */
 var queryStringHandler = (function (eventHandler) { 'use strict';
@@ -65,7 +65,7 @@ var queryStringHandler = (function (eventHandler) { 'use strict';
                     qs[key] = parseFloat(qs[key]);
                     break;
                 case 'int':
-                    qs[key] = parseInt(qs[key]);
+                    qs[key] = parseInt(qs[key], 10);
                     break;
             }
         });
