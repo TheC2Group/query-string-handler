@@ -119,7 +119,7 @@ npm install query-string-handler
 Tests
 -----
 
-Tests are written in qUnit. Open `/test/index.html` in a browser.
+Tests are written in qUnit. Open `/example/index.html` in a browser.
 
 
 ES5 methods to polyfill
