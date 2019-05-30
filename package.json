@@ -1,15 +1,12 @@
 {
   "name": "query-string-handler",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "This turns the query string into a private object. Use the API to read and manipulate the query string.",
   "jsnext:main": "query-string-handler.js",
   "main": "cjs/query-string-handler.js",
   "export": "queryStringHandler",
   "scripts": {
-    "iife": "rollup -c rollup-iife.config.js",
-    "cjs": "rollup -c rollup-cjs.config.js",
-    "umd": "rollup -c rollup-umd.config.js",
-    "build": "npm run iife && npm run cjs && npm run umd",
+    "build": "rollup -c rollup.config.js",
     "bundle-example": "browserify -e example/js/index.js -o example/bundle/index.js"
   },
   "repository": {
